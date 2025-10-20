@@ -6,13 +6,7 @@ app.use(cors());
 app.use(express.static("public"));
 app.use(express.json());
 
-let message = {
-  text: "",
-  status: "process",
-};
-
 const healthRoute = Router();
-
 healthRoute.get("/health", (req, res) => {
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
@@ -30,8 +24,11 @@ healthRoute.get("/health", (req, res) => {
   });
 });
 
+let message = {
+  text: "",
+  status: "process",
+};
 const pollingRoute = Router();
-
 pollingRoute.post("/polling", (req, res) => {
   message.text = req.body.message;
   setTimeout(() => {
