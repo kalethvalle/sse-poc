@@ -4,6 +4,12 @@ import express, { Router } from "express";
 const app = express();
 app.use(cors());
 app.use(express.static("public"));
+app.use(express.json());
+
+let message = {
+  text: "",
+  status: "process",
+};
 
 const healthRoute = Router();
 
@@ -16,7 +22,7 @@ healthRoute.get("/health", (req, res) => {
 
   const intervalId = setInterval(() => {
     res.write(`data: Server ${new Date().toISOString()}\n\n`);
-  }, 2000);
+  }, 1000);
 
   req.on("close", () => {
     clearInterval(intervalId);
@@ -24,7 +30,22 @@ healthRoute.get("/health", (req, res) => {
   });
 });
 
+const pollingRoute = Router();
+
+pollingRoute.post("/polling", (req, res) => {
+  message.text = req.body.message;
+  setTimeout(() => {
+    message.status = "done";
+  }, 30000);
+  res.status(200).json({ data: "message sent succesfully" });
+});
+
+pollingRoute.get("/polling", (req, res) => {
+  res.status(200).json({ message });
+});
+
 app.use("/api", healthRoute);
+app.use("/api", pollingRoute);
 
 app.listen(8080, () => {
   console.log("http://localhost:8080");

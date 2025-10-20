@@ -11,44 +11,113 @@
       flex-direction: row;
       gap: 1rem;
     }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+    }
   </style>
   <body>
-    <div class="btns-content">
-      <button id="btn-open">open conection</button>
-      <button id="btn-close">close conection</button>
+    <div class="content">
+      <div style="flex: 1">
+        <div class="btns-content">
+          <button id="btn-open">open conection</button>
+          <button id="btn-close">close conection</button>
+        </div>
+        <p>Last update: <strong id="last-update"></strong></p>
+        <ul id="health-list"></ul>
+        <script>
+          const btnOpen = document.getElementById("btn-open");
+          const btnClose = document.getElementById("btn-close");
+          const healthList = document.getElementById("health-list");
+          const lastUpdate = document.getElementById("last-update");
+          const healthEventSource = new EventSource("/api/health");
+
+          const listeningHealth = () => {
+            healthEventSource.onmessage = ({ data }) => {
+              const healthItem = document.createElement("li");
+              healthItem.className = "health-list-item";
+              healthItem.innerText = data;
+              healthList.appendChild(healthItem);
+
+              lastUpdate.innerText = data;
+            };
+
+            healthEventSource.onerror = (error) => {
+              console.error(error);
+            };
+          };
+
+          const closeConnet = () => {
+            if (healthEventSource.readyState !== EventSource.CLOSED) {
+              healthEventSource.close();
+            }
+          };
+
+          btnOpen.addEventListener("click", listeningHealth);
+          btnClose.addEventListener("click", closeConnet);
+        </script>
+      </div>
+      <div style="flex: 1">
+        <div style="display: flex; flex-direction: column; gap: 0.5rem">
+          <span style="font-weight: 800"> Body Message: </span>
+          <input type="text" id="txt-msg" style="height: 100px" />
+          <button id="btn-sent-msg">sent</button>
+        </div>
+        <p id="status">Estado:</p>
+        <script>
+          const $ = (selector) => {
+            return document.querySelector(selector);
+          };
+
+          const message = $("#txt-msg");
+          const btnSubmit = $("#btn-sent-msg");
+          const statusEl = $("#status");
+          btnSubmit.addEventListener("click", async () => {
+            if (message.value.trim()) {
+              await postMessage(message.value);
+              await getMessage();
+            } else {
+              alert("input sin mensage");
+            }
+          });
+
+          const postMessage = async (msg) => {
+            try {
+              const response = await fetch("/api/polling", {
+                method: "POST", // Puedes usar GET, PUT, DELETE, etc.
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ message: msg }), // Convertimos el objeto a JSON
+              });
+
+              const result = await response.json();
+              alert(result.data);
+            } catch (error) {
+              console.error("Error en la petición:", error);
+            }
+          };
+
+          const getMessage = async () => {
+            const intervalId = setInterval(async () => {
+              const res = await fetch("/api/polling");
+              const data = await res.json();
+
+              console.log(data.message);
+              statusEl.innerText = `Estado: ${data.message.status}`;
+
+              // Si ya terminó, detenemos el intervalo
+              if (data.message.status === "done") {
+                clearInterval(intervalId);
+                alert("✅ El mensaje ha sido procesado");
+              }
+            }, 5000);
+          };
+        </script>
+      </div>
     </div>
-    <p>Last update: <strong id="last-update"></strong></p>
-    <ul id="health-list"></ul>
-    <script>
-      const btnOpen = document.getElementById("btn-open");
-      const btnClose = document.getElementById("btn-close");
-      const healthList = document.getElementById("health-list");
-      const lastUpdate = document.getElementById("last-update");
-      const healthEventSource = new EventSource("/api/health");
-
-      const listeningHealth = () => {
-        healthEventSource.onmessage = ({ data }) => {
-          const healthItem = document.createElement("li");
-          healthItem.className = "health-list-item";
-          healthItem.innerText = data;
-          healthList.appendChild(healthItem);
-
-          lastUpdate.innerText = data;
-        };
-
-        healthEventSource.onerror = (error) => {
-          console.error(error);
-        };
-      };
-
-      const closeConnet = () => {
-        if (healthEventSource.readyState !== EventSource.CLOSED) {
-          healthEventSource.close();
-        }
-      };
-
-      btnOpen.addEventListener("click", listeningHealth);
-      btnClose.addEventListener("click", closeConnet);
-    </script>
   </body>
 </html>
