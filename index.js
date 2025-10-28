@@ -48,6 +48,7 @@ const testReq = Router();
 testReq.post("/resVerdi", (req, res) => {
   console.log(req.body);
   sammTips = req.body;
+  res.status(200).json({ message: "finalizado" });
 });
 
 app.use("/api", healthRoute);
