@@ -6,6 +6,7 @@ app.use(cors());
 app.use(express.static("public"));
 app.use(express.json());
 
+let sammTips = {};
 const healthRoute = Router();
 healthRoute.get("/health", (req, res) => {
   res.writeHead(200, {
@@ -15,7 +16,9 @@ healthRoute.get("/health", (req, res) => {
   });
 
   const intervalId = setInterval(() => {
-    res.write(`data: Server ${new Date().toISOString()}\n\n`);
+    if (sammTips) {
+      res.write(`data: ${JSON.stringify(sammTips)}\n\n`);
+    }
   }, 1000);
 
   req.on("close", () => {
@@ -41,8 +44,15 @@ pollingRoute.get("/polling", (req, res) => {
   res.status(200).json({ message });
 });
 
+const testReq = Router();
+testReq.post("/resVerdi", (req, res) => {
+  console.log(req.body);
+  sammTips = req.body;
+});
+
 app.use("/api", healthRoute);
 app.use("/api", pollingRoute);
+app.use("/api", testReq);
 
 app.listen(8080, () => {
   console.log("http://localhost:8080");
