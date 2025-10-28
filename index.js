@@ -54,7 +54,8 @@ app.use("/api", healthRoute);
 app.use("/api", pollingRoute);
 app.use("/api", testReq);
 
-app.listen(8080, () => {
-  console.log("http://localhost:8080");
-  console.log("http://localhost:8080/api/health");
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📡 SSE endpoint: http://localhost:${PORT}/api/health`);
 });
