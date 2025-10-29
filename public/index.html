@@ -210,11 +210,12 @@
                   border: "1px solid #ccc",
                   borderRadius: "8px",
                   margin: "5px",
+                  overflow: "hidden auto",
                 }}
               >
                 {listening && <p> listening... </p>}
                 {listening &&
-                  message.length > 0 &&
+                  message.length &&
                   message.map((msg) => <ul>{msg}</ul>)}
               </div>
               <div
