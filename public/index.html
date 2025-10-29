@@ -146,7 +146,8 @@
           setListening(true);
           healthEventSource.onmessage = ({ data }) => {
             let response = JSON.parse(data);
-            setMessage([...message, response.message]);
+            setMessage((prev) => [...prev, response.message]);
+            // setMessage([...message, response.message]);
           };
 
           healthEventSource.onerror = (error) => {
