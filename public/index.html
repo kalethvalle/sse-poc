@@ -20,7 +20,9 @@
     }
   </style>
   <body>
-    <div class="content">
+    <div id="root"></div>
+
+    <!-- <div class="content">
       <div style="flex: 1">
         <div class="btns-content">
           <button id="btn-open">open conection</button>
@@ -119,6 +121,71 @@
           };
         </script>
       </div>
-    </div>
+    </div> -->
+
+    <!-- React and ReactDOM from CDN -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    ></script>
+
+    <!-- Babel (to use JSX in the browser) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const Sse = () => {
+        const healthEventSource = new EventSource("/api/health");
+        const [message, setMessage] = React.useState([]);
+
+        const listeningHealth = () => {
+          healthEventSource.onmessage = ({ data }) => {
+            let response = JSON.parse(data);
+            const healthItem = document.createElement("li");
+            healthItem.className = "health-list-item";
+            setMessage([...message, response.message]);
+          };
+
+          healthEventSource.onerror = (error) => {
+            console.error(error);
+          };
+        };
+
+        const closeConnet = () => {
+          if (healthEventSource.readyState !== EventSource.CLOSED) {
+            healthEventSource.close();
+          }
+        };
+        return (
+          <div>
+            <h1>POC SSE</h1>
+            <div class="btns-content">
+              <button onClick={listeningHealth}>open conection</button>
+              <button onClick={closeConnet}>close conection</button>
+            </div>
+            <div>
+              {message.map((msg) => (
+                <ul>{msg}</ul>
+              ))}
+            </div>
+          </div>
+        );
+      };
+      // Define a simple React component
+      const App = () => {
+        return (
+          <div>
+            <Sse />
+          </div>
+        );
+      };
+
+      // Render the App component into the 'root' div
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
   </body>
 </html>
