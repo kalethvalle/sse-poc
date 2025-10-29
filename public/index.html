@@ -161,7 +161,7 @@
           }
         };
         return (
-          <div style={{ backgroundColor: "red" }}>
+          <div>
             <h1>POC SSE</h1>
             <div className="btns-content">
               <button onClick={() => listeningHealth()}>
@@ -177,7 +177,10 @@
                 gap: "1rem",
               }}
             >
-              {listening && message.map((msg) => <ul>{msg}</ul>)}
+              <p>tiene datos {message.length}</p>
+              {listening &&
+                message.length &&
+                message.map((msg) => <ul>{msg}</ul>)}
             </div>
           </div>
         );
