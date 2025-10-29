@@ -20,15 +20,13 @@
     }
   </style>
   <body>
-    <div id="root"></div>
-
-    <!-- <div class="content">
+    <div class="content">
       <div style="flex: 1">
         <div class="btns-content">
           <button id="btn-open">open conection</button>
           <button id="btn-close">close conection</button>
         </div>
-        <p>Last update: <strong id="last-update"></strong></p>
+        <!-- <p>Last update: <strong id="last-update"></strong></p> -->
         <ul id="health-list"></ul>
         <script>
           const btnOpen = document.getElementById("btn-open");
@@ -45,7 +43,7 @@
               healthItem.innerText = response.message;
               healthList.appendChild(healthItem);
 
-              lastUpdate.innerText = response.message;
+              // lastUpdate.innerText = response.message;
             };
 
             healthEventSource.onerror = (error) => {
@@ -121,136 +119,6 @@
           };
         </script>
       </div>
-    </div> -->
-
-    <!-- React and ReactDOM from CDN -->
-    <script
-      crossorigin
-      src="https://unpkg.com/react@18/umd/react.development.js"
-    ></script>
-    <script
-      crossorigin
-      src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
-    ></script>
-
-    <!-- Babel (to use JSX in the browser) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-    <script type="text/babel">
-      const Sse = () => {
-        const healthEventSource = new EventSource("/api/health");
-        const [message, setMessage] = React.useState([]);
-        const [textMsg, setTextMsg] = React.useState("");
-        const [listening, setListening] = React.useState(false);
-
-        const listeningHealth = () => {
-          setListening(true);
-          healthEventSource.onmessage = ({ data }) => {
-            let response = JSON.parse(data);
-            setMessage((prev) => [...prev, response.message]);
-          };
-
-          healthEventSource.onerror = (error) => {
-            console.error(error);
-          };
-        };
-
-        const closeConnet = () => {
-          setListening(false);
-          if (healthEventSource.readyState !== EventSource.CLOSED) {
-            healthEventSource.close();
-          }
-        };
-
-        const onChangeValue = (value) => {
-          setTextMsg(value);
-        };
-
-        const sendMessage = async () => {
-          try {
-            const response = await fetch(
-              "https://web.furycloud.io/api/proxy/verdi_flows/webhook-test/9c4f0ea5-bf8b-400a-a24e-d82a76b9ec0a",
-              {
-                method: "POST", // Puedes usar GET, PUT, DELETE, etc.
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ context: textMsg }), // Convertimos el objeto a JSON
-              }
-            );
-
-            const result = await response.json();
-            alert(result.data);
-          } catch (error) {
-            console.error("Error en la petición:", error);
-          }
-        };
-
-        return (
-          <div>
-            <h1>POC SSE</h1>
-            <div className="btns-content">
-              <button onClick={() => listeningHealth()}>
-                open conection {listening ? "On" : "Off"}
-              </button>
-              <button onClick={() => closeConnet()}> close conection</button>
-            </div>
-            <div
-              style={{
-                flex: 1,
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.5rem",
-                height: "80vh",
-              }}
-            >
-              <div
-                style={{
-                  flex: 1,
-                  border: "1px solid #ccc",
-                  borderRadius: "8px",
-                  margin: "5px",
-                  overflow: "hidden auto",
-                }}
-              >
-                {listening && <p> listening... </p>}
-                {listening &&
-                  message.length &&
-                  message.map((msg) => <ul>{msg}</ul>)}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: "0.5rem",
-                }}
-              >
-                <input
-                  type="text"
-                  style={{
-                    flex: 1,
-                    height: "30px",
-                  }}
-                  onChange={({ target: { value } }) => onChangeValue(value)}
-                />
-                <button onClick={() => sendMessage()}>sent</button>
-              </div>
-            </div>
-          </div>
-        );
-      };
-      // Define a simple React component
-      const App = () => {
-        return (
-          <div>
-            <Sse />
-          </div>
-        );
-      };
-
-      // Render the App component into the 'root' div
-      const root = ReactDOM.createRoot(document.getElementById("root"));
-      root.render(<App />);
-    </script>
+    </div>
   </body>
 </html>
