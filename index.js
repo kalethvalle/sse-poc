@@ -6,7 +6,7 @@ app.use(cors());
 app.use(express.static("public"));
 app.use(express.json());
 
-let sammTips = {};
+let sammTips = null;
 const healthRoute = Router();
 healthRoute.get("/health", (req, res) => {
   res.writeHead(200, {
@@ -18,6 +18,7 @@ healthRoute.get("/health", (req, res) => {
   const intervalId = setInterval(() => {
     if (sammTips) {
       res.write(`data: ${JSON.stringify(sammTips)}\n\n`);
+      sammTips = null;
     }
   }, 1000);
 
