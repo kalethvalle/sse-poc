@@ -37,12 +37,13 @@
 
           const listeningHealth = () => {
             healthEventSource.onmessage = ({ data }) => {
+              let response = JSON.parse(data);
               const healthItem = document.createElement("li");
               healthItem.className = "health-list-item";
-              healthItem.innerText = data;
+              healthItem.innerText = response.message;
               healthList.appendChild(healthItem);
 
-              lastUpdate.innerText = data;
+              lastUpdate.innerText = response.message;
             };
 
             healthEventSource.onerror = (error) => {
