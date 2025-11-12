@@ -1,124 +1,250 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Poc Chatbot</title>
+    <style>
+      body {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      #root {
+        background-color: red;
+        padding: none;
+        margin: none;
+        margin-top: -21px;
+        /* height: 100vh; */
+      }
+      .content {
+        background-color: green;
+        height: 91.8vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel">
+      const App = () => {
+        const containerRef = React.useRef(null);
+        const [count, setCount] = React.useState(0);
+
+        const healthEventSource = new EventSource("/api/health");
+
+        const listeningHealth = () => {
+          healthEventSource.onmessage = ({ data }) => {
+            let response = JSON.parse(data);
+            const healthItem = document.createElement("li");
+            healthItem.className = "health-list-item";
+            healthItem.innerText = response.message;
+            healthList.appendChild(healthItem);
+
+            // lastUpdate.innerText = response.message;
+          };
+
+          healthEventSource.onerror = (error) => {
+            console.error(error);
+          };
+        };
+
+        const closeConnet = () => {
+          if (healthEventSource.readyState !== EventSource.CLOSED) {
+            healthEventSource.close();
+          }
+        };
+
+        React.useEffect(() => {
+          const container = containerRef.current;
+
+          if (!container) {
+            return;
+          }
+
+          container.appendChild(svg);
+        }, [count]);
+
+        return (
+          <div
+            style={{
+              backgroundColor: "orange",
+            }}
+          >
+            <h4>Poc Chatbot</h4>
+            <div
+              className="content"
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+                backgroundColor: "blue",
+                // height: "100%",
+              }}
+            >
+              <div
+                ref={containerRef}
+                style={{
+                  flex: 1,
+                  backgroundColor: "yellow",
+                }}
+              >
+                seccion de mensajes
+              </div>
+              <div
+                style={{
+                  //   flex: 1,
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "0.5rem",
+                }}
+              >
+                <p>You clicked {count} times</p>
+                <button onClick={() => setCount(count + 1)}>Click me</button>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      // Render the component to the DOM
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html> -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Event Health Check</title>
+    <title>Poc Chatbot</title>
+    <style>
+      body {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+
+      #root {
+        background-color: red;
+        margin-top: -21px;
+      }
+
+      .content {
+        background-color: green;
+        height: 91.8vh;
+      }
+
+      .message-item {
+        background: #fff;
+        padding: 5px 10px;
+        margin: 5px 0;
+        border-radius: 4px;
+      }
+    </style>
   </head>
-  <style>
-    .btns-content {
-      display: flex;
-      flex-direction: row;
-      gap: 1rem;
-    }
-
-    .content {
-      flex: 1;
-      display: flex;
-      flex-direction: row;
-      gap: 1rem;
-    }
-  </style>
   <body>
-    <div class="content">
-      <div style="flex: 1">
-        <div class="btns-content">
-          <button id="btn-open">open conection</button>
-          <button id="btn-close">close conection</button>
-        </div>
-        <!-- <p>Last update: <strong id="last-update"></strong></p> -->
-        <ul id="health-list"></ul>
-        <script>
-          const btnOpen = document.getElementById("btn-open");
-          const btnClose = document.getElementById("btn-close");
-          const healthList = document.getElementById("health-list");
-          const lastUpdate = document.getElementById("last-update");
-          const healthEventSource = new EventSource("/api/health");
+    <div id="root"></div>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-          const listeningHealth = () => {
-            healthEventSource.onmessage = ({ data }) => {
-              let response = JSON.parse(data);
-              const healthItem = document.createElement("li");
-              healthItem.className = "health-list-item";
-              healthItem.innerText = response.message;
-              healthList.appendChild(healthItem);
+    <script type="text/babel">
+      const App = () => {
+        const containerRef = React.useRef(null);
+        const [count, setCount] = React.useState(0);
+        const [messages, setMessages] = React.useState([]);
 
-              // lastUpdate.innerText = response.message;
-            };
+        const healthEventSource = React.useMemo(
+          () => new EventSource("/api/health"),
+          []
+        );
 
-            healthEventSource.onerror = (error) => {
-              console.error(error);
-            };
+        React.useEffect(() => {
+          // Escuchar mensajes SSE
+          healthEventSource.onmessage = ({ data }) => {
+            try {
+              const response = JSON.parse(data);
+              setMessages((prev) => [...prev, response.message]);
+            } catch (err) {
+              console.error("Error parsing SSE message:", err);
+            }
           };
 
-          const closeConnet = () => {
+          healthEventSource.onerror = (error) => {
+            console.error("SSE error:", error);
+          };
+
+          // Cierre limpio al desmontar
+          return () => {
             if (healthEventSource.readyState !== EventSource.CLOSED) {
               healthEventSource.close();
             }
           };
+        }, [healthEventSource]);
 
-          btnOpen.addEventListener("click", listeningHealth);
-          btnClose.addEventListener("click", closeConnet);
-        </script>
-      </div>
-      <div style="flex: 1">
-        <div style="display: flex; flex-direction: column; gap: 0.5rem">
-          <span style="font-weight: 800"> Body Message: </span>
-          <input type="text" id="txt-msg" style="height: 100px" />
-          <button id="btn-sent-msg">sent</button>
-        </div>
-        <p id="status">Estado:</p>
-        <script>
-          const $ = (selector) => {
-            return document.querySelector(selector);
-          };
+        return (
+          <div style={{ backgroundColor: "orange" }}>
+            <h4>Poc Chatbot</h4>
+            <div
+              className="content"
+              style={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.5rem",
+                backgroundColor: "blue",
+              }}
+            >
+              <div
+                ref={containerRef}
+                style={{
+                  flex: 1,
+                  backgroundColor: "yellow",
+                  overflowY: "auto",
+                  padding: "10px",
+                }}
+              >
+                <h5>Sección de mensajes</h5>
+                {messages.map((msg, index) => (
+                  <div key={index} className="message-item">
+                    {msg}
+                  </div>
+                ))}
+              </div>
 
-          const message = $("#txt-msg");
-          const btnSubmit = $("#btn-sent-msg");
-          const statusEl = $("#status");
-          btnSubmit.addEventListener("click", async () => {
-            if (message.value.trim()) {
-              await postMessage(message.value);
-              await getMessage();
-            } else {
-              alert("input sin mensage");
-            }
-          });
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "0.5rem",
+                }}
+              >
+                <p>You clicked {count} times</p>
+                <button onClick={() => setCount(count + 1)}>Click me</button>
+              </div>
+            </div>
+          </div>
+        );
+      };
 
-          const postMessage = async (msg) => {
-            try {
-              const response = await fetch("/api/polling", {
-                method: "POST", // Puedes usar GET, PUT, DELETE, etc.
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ message: msg }), // Convertimos el objeto a JSON
-              });
-
-              const result = await response.json();
-              alert(result.data);
-            } catch (error) {
-              console.error("Error en la petición:", error);
-            }
-          };
-
-          const getMessage = async () => {
-            const intervalId = setInterval(async () => {
-              const res = await fetch("/api/polling");
-              const data = await res.json();
-
-              console.log(data.message);
-              statusEl.innerText = `Estado: ${data.message.status}`;
-
-              // Si ya terminó, detenemos el intervalo
-              if (data.message.status === "done") {
-                clearInterval(intervalId);
-                alert("✅ El mensaje ha sido procesado");
-              }
-            }, 5000);
-          };
-        </script>
-      </div>
-    </div>
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
   </body>
 </html>
