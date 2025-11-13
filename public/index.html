@@ -135,13 +135,11 @@
       }
 
       #root {
-        background-color: red;
         margin-top: -21px;
       }
 
       .content {
-        background-color: green;
-        height: 91.8vh;
+        height: 93vh;
       }
 
       .message-item {
@@ -168,6 +166,7 @@
       const App = () => {
         const containerRef = React.useRef(null);
         const [count, setCount] = React.useState(0);
+        const [msg, setMsg] = React.useState("");
         const [messages, setMessages] = React.useState([]);
 
         const healthEventSource = React.useMemo(
@@ -198,8 +197,29 @@
           };
         }, [healthEventSource]);
 
+        const sentMessage = async (bodyMsg) => {
+          try {
+            const urlBot = "/api/verdi/sendMessage";
+            const response = await fetch(urlBot, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ context: bodyMsg }), // Convertimos el objeto a JSON
+            });
+
+            const result = await response.json();
+            console.log(result);
+          } catch (error) {
+            console.error("Error en la petición:", error);
+          } finally {
+            setMsg("");
+            setMessages((prev) => [...prev, bodyMsg]);
+          }
+        };
+
         return (
-          <div style={{ backgroundColor: "orange" }}>
+          <div>
             <h4>Poc Chatbot</h4>
             <div
               className="content"
@@ -208,14 +228,12 @@
                 display: "flex",
                 flexDirection: "column",
                 gap: "0.5rem",
-                backgroundColor: "blue",
               }}
             >
               <div
                 ref={containerRef}
                 style={{
                   flex: 1,
-                  backgroundColor: "yellow",
                   overflowY: "auto",
                   padding: "10px",
                 }}
@@ -233,10 +251,28 @@
                   display: "flex",
                   flexDirection: "row",
                   gap: "0.5rem",
+                  padding: "10px",
                 }}
               >
-                <p>You clicked {count} time</p>
-                <button onClick={() => setCount(count + 1)}>Click me</button>
+                <input
+                  style={{
+                    flex: 1,
+                    borderRadius: "8px",
+                    border: "1px solid #bbb",
+                    height: "30px",
+                  }}
+                  value={msg}
+                  onChange={({ target }) => setMsg(target.value)}
+                />
+                <button
+                  style={{
+                    borderRadius: "8px",
+                    border: "1px solid #bbb",
+                  }}
+                  onClick={() => sentMessage(msg)}
+                >
+                  Send
+                </button>
               </div>
             </div>
           </div>

@@ -52,6 +52,26 @@ testReq.post("/resVerdi", (req, res) => {
   res.status(200).json({ message: "finalizado" });
 });
 
+testReq.post("/verdi/sendMessage", async (req, res) => {
+  const { context } = req.body;
+  try {
+    console.log("llego a verdi");
+    const urlBot =
+      "https://web.furycloud.io/api/proxy/verdi_flows/webhook-test/9c4f0ea5-bf8b-400a-a24e-d82a76b9ec0a";
+    const response = await fetch(urlBot, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ context }), // Convertimos el objeto a JSON
+    });
+    res.status(200).json({ data: response });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "error enviando consulta LLM" });
+  }
+});
+
 app.use("/api", healthRoute);
 app.use("/api", pollingRoute);
 app.use("/api", testReq);
