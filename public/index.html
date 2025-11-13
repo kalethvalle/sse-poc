@@ -206,7 +206,7 @@
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ context }), // Convertimos el objeto a JSON
+              body: JSON.stringify({ context: bodyMsg }), // Convertimos el objeto a JSON
             });
 
             const result = await response.json();
