@@ -199,8 +199,7 @@
 
         const sentMessage = async (bodyMsg) => {
           try {
-            const urlBot =
-              "https://web.furycloud.io/api/proxy/verdi_flows/webhook-test/9c4f0ea5-bf8b-400a-a24e-d82a76b9ec0a";
+            const urlBot = "/api/verdi/sendMessage";
             const response = await fetch(urlBot, {
               method: "POST",
               headers: {
@@ -210,7 +209,7 @@
             });
 
             const result = await response.json();
-            console.log(result.data);
+            alert(result.data);
           } catch (error) {
             console.error("Error en la petición:", error);
           } finally {
@@ -237,6 +236,7 @@
                   flex: 1,
                   overflowY: "auto",
                   padding: "10px",
+                  backgroundColor: "#e0e0e060",
                 }}
               >
                 <h5>Sección de mensajes</h5>
@@ -245,35 +245,6 @@
                     {msg}
                   </div>
                 ))}
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  gap: "0.5rem",
-                  padding: "10px",
-                }}
-              >
-                <input
-                  style={{
-                    flex: 1,
-                    borderRadius: "8px",
-                    border: "1px solid #bbb",
-                    height: "30px",
-                  }}
-                  value={msg}
-                  onChange={({ target }) => setMsg(target.value)}
-                />
-                <button
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid #bbb",
-                  }}
-                  onClick={() => sentMessage(msg)}
-                >
-                  Send
-                </button>
               </div>
             </div>
           </div>
