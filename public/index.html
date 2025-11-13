@@ -199,17 +199,18 @@
 
         const sentMessage = async (bodyMsg) => {
           try {
-            const urlBot = "/api/verdi/sendMessage";
+            const urlBot =
+              "https://web.furycloud.io/api/proxy/verdi_flows/webhook-test/9c4f0ea5-bf8b-400a-a24e-d82a76b9ec0a";
             const response = await fetch(urlBot, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ context: bodyMsg }), // Convertimos el objeto a JSON
+              body: JSON.stringify({ context }), // Convertimos el objeto a JSON
             });
 
             const result = await response.json();
-            console.log(result);
+            console.log(result.data);
           } catch (error) {
             console.error("Error en la petición:", error);
           } finally {
